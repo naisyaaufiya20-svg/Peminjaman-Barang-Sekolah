@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Peminjaman Bizarre</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #1a1a2e;
+            --bg-card: #16213e;
+            --accent-gold: #f7b733;
+            --accent-pink: #e94560;
+            --text-light: #e0e0e0;
+            --text-dark: #0f3460;
+            --border-color: rgba(247, 183, 51, 0.3);
+        }
+        body {
+            font-family: 'Jost', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            /* Menacing Background */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 100 100'%3E%3Ctext x='10' y='60' font-size='50' fill='rgba(255,255,255,0.04)' font-family='serif' transform='rotate(-15 50 50)'%3Eゴゴゴ%3C/text%3E%3C/svg%3E");
+        }
+        .jojo-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+        }
+        .jojo-header {
+            color: var(--accent-gold);
+            text-shadow: 0 0 5px rgba(247, 183, 51, 0.7);
+        }
+        .jojo-button {
+            background-color: var(--accent-gold);
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .jojo-button:hover {
+            background-color: var(--text-light);
+            box-shadow: 0 0 15px var(--accent-gold);
+        }
+        .jojo-button-alt {
+            background-color: var(--accent-pink);
+            color: var(--text-light);
+        }
+        .jojo-button-alt:hover {
+            background-color: #ff7675;
+             box-shadow: 0 0 15px var(--accent-pink);
+        }
+        .jojo-input, .jojo-select {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+        }
+        .jojo-input:focus, .jojo-select:focus {
+            --tw-ring-color: var(--accent-gold);
+            border-color: var(--accent-gold);
+        }
+        table thead {
+            background-color: rgba(15, 52, 96, 0.5);
+            text-transform: uppercase;
+        }
+        .fade-in {
+            animation: fadeIn 0.7s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .hidden {
+            display: none;
+        }
+        .overdue-text {
+            color: var(--accent-pink);
+            text-shadow: 0 0 8px var(--accent-pink);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Kontainer Utama -->
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <!-- ===== HALAMAN LOGIN ===== -->
+        <div id="loginPage" class="max-w-md mx-auto jojo-card rounded-xl shadow-lg overflow-hidden md:max-w-2xl fade-in">
+            <div class="md:flex">
+                <div class="w-full p-8">
+                    <div class="text-center">
+                        <h1 class="text-3xl font-bold jojo-header tracking-widest">『SISTEM PEMINJAMAN BIZARRE』</h1>
+                        <p class="mt-2 text-gray-400">Silakan masuk untuk melanjutkan petualanganmu.</p>
+                    </div>
+                    <form id="loginForm" class="mt-8 space-y-6">
+                        <div>
+                            <label for="role" class="block text-sm font-medium text-gray-300">Masuk sebagai</label>
+                            <select id="role" name="role"
+                                class="jojo-select mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-1 sm:text-sm rounded-md">
+                                <option value="user">User (Siswa/Guru)</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label id="username-label" for="username-select" class="block text-sm font-medium text-gray-300">Pilih Nama Anda</label>
+                            <select id="username-select" class="jojo-select mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-1 sm:text-sm rounded-md">
+                                <!-- Opsi nama pengguna akan diisi oleh JavaScript -->
+                            </select>
+                            <input type="text" id="admin-username-input" placeholder="admin" class="jojo-input mt-1 block w-full px-3 py-2 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-1 sm:text-sm hidden">
+                        </div>
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
+                            <input type="password" id="password" name="password" required
+                                class="jojo-input mt-1 block w-full px-3 py-2 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-1 sm:text-sm">
+                        </div>
+                        <p id="loginError" class="text-red-400 text-sm text-center"></p>
+                        <div>
+                            <button type="submit"
+                                class="jojo-button w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium">
+                                ORA ORA ORA! (Masuk)
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== HALAMAN ADMIN ===== -->
+        <div id="adminPage" class="hidden fade-in space-y-8">
+            <div class="flex justify-between items-center jojo-card p-4 rounded-xl shadow-lg">
+                <div>
+                    <h1 class="text-2xl font-bold jojo-header">Dashboard Admin</h1>
+                    <p class="text-gray-400">Yare yare daze... Selamat datang, <span id="adminName">Admin</span>!</p>
+                </div>
+                <button id="adminLogoutBtn" class="jojo-button jojo-button-alt py-2 px-4 rounded-lg">
+                    Keluar
+                </button>
+            </div>
+
+            <div class="jojo-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 jojo-header">Tambah Inventaris Baru</h2>
+                <form id="addItemForm" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div>
+                        <label for="itemName" class="block text-sm font-medium text-gray-300">Nama Barang</label>
+                        <input type="text" id="itemName" required class="jojo-input mt-1 w-full p-2 rounded-md">
+                    </div>
+                    <div>
+                        <label for="itemTotal" class="block text-sm font-medium text-gray-300">Jumlah Total</label>
+                        <input type="number" id="itemTotal" min="1" required class="jojo-input mt-1 w-full p-2 rounded-md">
+                    </div>
+                    <div>
+                         <label for="itemCode" class="block text-sm font-medium text-gray-300">Kode Barang</label>
+                         <input type="text" id="itemCode" required class="jojo-input mt-1 w-full p-2 rounded-md">
+                    </div>
+                    <button type="submit" class="jojo-button py-2 px-4 rounded-lg h-10">Tambah Barang</button>
+                </form>
+            </div>
+
+            <div class="jojo-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 jojo-header">Daftar Semua Inventaris</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Kode</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Nama Barang</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Tersedia</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Dipinjam</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Total</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminInventoryTable" class="text-gray-300"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="jojo-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 jojo-header">Riwayat Peminjaman</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Peminjam</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Barang</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Tgl Kembali</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Status</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Kondisi Kembali</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loanHistoryTable" class="text-gray-300"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== HALAMAN USER ===== -->
+        <div id="userPage" class="hidden fade-in space-y-8">
+            <div class="flex justify-between items-center jojo-card p-4 rounded-xl shadow-lg">
+                <div>
+                    <h1 class="text-2xl font-bold jojo-header">Halaman Peminjaman</h1>
+                    <p class="text-gray-400">Selamat datang, <span id="userName">User</span>!</p>
+                </div>
+                <button id="userLogoutBtn" class="jojo-button jojo-button-alt py-2 px-4 rounded-lg">
+                    Keluar
+                </button>
+            </div>
+
+            <div class="jojo-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 jojo-header">Daftar Barang Tersedia</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Kode</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Nama Barang</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Status</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Jumlah Tersedia</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userInventoryTable" class="text-gray-300"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="jojo-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 jojo-header">Barang yang Sedang Saya Pinjam</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                         <thead>
+                            <tr>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Nama Barang</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Jumlah</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Kelas</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Tanggal Pinjam</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Tanggal Kembali</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myLoansTable" class="text-gray-300"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL PEMINJAMAN ===== -->
+    <div id="loanModal" class="hidden fixed z-10 inset-0 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true"><div class="absolute inset-0 bg-black opacity-75"></div></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom jojo-card rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <form id="loanForm">
+                    <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <h3 class="text-lg leading-6 font-bold jojo-header" id="modalTitle">Form Peminjaman</h3>
+                        <div class="mt-4 space-y-4">
+                            <p class="text-sm text-gray-400">Anda akan meminjam: <strong id="modalItemName" class="text-yellow-300"></strong></p>
+                            <input type="hidden" id="modalItemId">
+                            <div>
+                                <label for="borrowerName" class="block text-sm font-medium text-gray-300">Nama Lengkap Peminjam</label>
+                                <input type="text" id="borrowerName" required class="jojo-input mt-1 w-full p-2 rounded-md" readonly>
+                            </div>
+                            <div>
+                                <label for="borrowerClass" class="block text-sm font-medium text-gray-300">Kelas</label>
+                                <input type="text" id="borrowerClass" required class="jojo-input mt-1 w-full p-2 rounded-md" placeholder="Contoh: XI RPL 2">
+                            </div>
+                            <div>
+                                <label for="loanQuantity" class="block text-sm font-medium text-gray-300">Jumlah Pinjam</label>
+                                <input type="number" id="loanQuantity" min="1" value="1" required class="jojo-input mt-1 w-full p-2 rounded-md">
+                            </div>
+                            <div>
+                                <label for="returnDate" class="block text-sm font-medium text-gray-300">Tanggal Pengembalian</label>
+                                <input type="date" id="returnDate" required class="jojo-input mt-1 w-full p-2 rounded-md">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 bg-opacity-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit" class="jojo-button w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base sm:ml-3 sm:w-auto sm:text-sm">
+                            Konfirmasi Pinjam
+                        </button>
+                        <button type="button" id="closeModalBtn" class="mt-3 w-full inline-flex justify-center rounded-md shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL PENGEMBALIAN ===== -->
+    <div id="returnModal" class="hidden fixed z-10 inset-0 overflow-y-auto">
+         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true"><div class="absolute inset-0 bg-black opacity-75"></div></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom jojo-card rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <form id="returnForm">
+                    <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <h3 class="text-lg leading-6 font-bold jojo-header">Form Pengembalian Barang</h3>
+                        <div class="mt-4 space-y-4">
+                            <p class="text-sm text-gray-400">Konfirmasi pengembalian untuk: <strong id="returnModalInfo" class="text-yellow-300"></strong></p>
+                            <input type="hidden" id="returnModalLoanId">
+                            <div>
+                                <label for="returnCondition" class="block text-sm font-medium text-gray-300">Kondisi Barang Saat Dikembalikan</label>
+                                <select id="returnCondition" required class="jojo-select mt-1 block w-full pl-3 pr-10 py-2 text-base rounded-md">
+                                    <option value="Baik">Baik</option>
+                                    <option value="Rusak Ringan">Rusak Ringan</option>
+                                    <option value="Rusak Berat">Rusak Berat</option>
+                                    <option value="Hilang">Hilang</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 bg-opacity-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit" class="jojo-button w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base sm:ml-3 sm:w-auto sm:text-sm">
+                            Konfirmasi Kembali
+                        </button>
+                        <button type="button" id="closeReturnModalBtn" class="mt-3 w-full inline-flex justify-center rounded-md shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // === Simulasi Database ===
+        let inventory = [
+            { id: 1, code: 'PRJ-01', name: 'Proyektor BenQ', total: 5, borrowed: 2 },
+            { id: 2, code: 'MIC-05', name: 'Mikrofon Wireless', total: 10, borrowed: 8 },
+            { id: 3, code: 'SPK-02', name: 'Speaker Aktif', total: 4, borrowed: 1 },
+            { id: 4, code: 'KBL-15', name: 'Kabel HDMI 15m', total: 8, borrowed: 0 },
+        ];
+
+        let loans = [
+            { loanId: 1, itemId: 1, borrowerName: 'Budi Santoso', className: 'XII IPA 1', quantity: 1, loanDate: '2025-09-15', returnDate: '2025-09-22', status: 'Dipinjam', returnCondition: null },
+            { loanId: 2, itemId: 3, borrowerName: 'Citra Lestari', className: 'XI IPS 3', quantity: 1, loanDate: '2025-09-16', returnDate: '2025-09-18', status: 'Dipinjam', returnCondition: null },
+            { loanId: 3, itemId: 1, borrowerName: 'Ahmad Dahlan', className: 'Guru', quantity: 1, loanDate: '2025-09-10', returnDate: '2025-09-12', status: 'Dipinjam', returnCondition: null },
+            { loanId: 4, itemId: 2, borrowerName: 'Dewi Anjani', className: 'XII BAHASA', quantity: 5, loanDate: '2025-09-14', returnDate: '2025-09-21', status: 'Dikembalikan', returnCondition: 'Baik' },
+            { loanId: 5, itemId: 2, borrowerName: 'Eka Wijaya', className: 'X-A', quantity: 8, loanDate: '2025-09-17', returnDate: '2025-09-24', status: 'Dipinjam', returnCondition: null },
+        ];
+
+        let users = [
+            { username: 'Budi Santoso', password: 'password123' },
+            { username: 'Citra Lestari', password: 'password456' },
+            { username: 'Ahmad Dahlan', password: 'password789' },
+            { username: 'Dewi Anjani', password: 'password101' },
+            { username: 'Eka Wijaya', password: 'password112' }
+        ];
+        
+        let currentUser = null;
+
+        // === Referensi Elemen DOM ===
+        const loginPage = document.getElementById('loginPage');
+        const adminPage = document.getElementById('adminPage');
+        const userPage = document.getElementById('userPage');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const roleDropdown = document.getElementById('role');
+        const userSelect = document.getElementById('username-select');
+        const adminUsernameInput = document.getElementById('admin-username-input');
+        const usernameLabel = document.getElementById('username-label');
+
+        const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+        const addItemForm = document.getElementById('addItemForm');
+        const adminInventoryTable = document.getElementById('adminInventoryTable');
+        const loanHistoryTable = document.getElementById('loanHistoryTable');
+
+        const userLogoutBtn = document.getElementById('userLogoutBtn');
+        const userInventoryTable = document.getElementById('userInventoryTable');
+        const myLoansTable = document.getElementById('myLoansTable');
+        const userNameSpan = document.getElementById('userName');
+
+        const loanModal = document.getElementById('loanModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const loanForm = document.getElementById('loanForm');
+        const modalItemName = document.getElementById('modalItemName');
+        const modalItemId = document.getElementById('modalItemId');
+        const borrowerNameInput = document.getElementById('borrowerName');
+        const borrowerClassInput = document.getElementById('borrowerClass');
+        const returnDateInput = document.getElementById('returnDate');
+        const loanQuantityInput = document.getElementById('loanQuantity');
+
+        const returnModal = document.getElementById('returnModal');
+        const closeReturnModalBtn = document.getElementById('closeReturnModalBtn');
+        const returnForm = document.getElementById('returnForm');
+        const returnModalLoanId = document.getElementById('returnModalLoanId');
+        const returnModalInfo = document.getElementById('returnModalInfo');
+        const returnConditionSelect = document.getElementById('returnCondition');
+
+        // === FUNGSI RENDER ===
+        
+        function renderAdminInventory() {
+            adminInventoryTable.innerHTML = '';
+            inventory.forEach(item => {
+                const available = item.total - item.borrowed;
+                const row = `
+                    <tr class="border-b border-gray-700">
+                        <td class="py-3 px-4">${item.code}</td>
+                        <td class="py-3 px-4 font-medium text-yellow-300">${item.name}</td>
+                        <td class="py-3 px-4 text-green-400 font-semibold">${available}</td>
+                        <td class="py-3 px-4 text-red-400 font-semibold">${item.borrowed}</td>
+                        <td class="py-3 px-4">${item.total}</td>
+                        <td class="py-3 px-4">
+                            <button data-id="${item.id}" class="delete-item-btn bg-red-800 text-red-100 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full hover:bg-red-600">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+                adminInventoryTable.innerHTML += row;
+            });
+        }
+        
+        function renderLoanHistory() {
+            loanHistoryTable.innerHTML = '';
+            if (loans.length === 0) {
+                 loanHistoryTable.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">Belum ada riwayat peminjaman.</td></tr>';
+                 return;
+            }
+            const sortedLoans = [...loans].sort((a, b) => (a.status === 'Dipinjam' ? -1 : 1) - (b.status === 'Dipinjam' ? -1 : 1));
+
+            sortedLoans.forEach(loan => {
+                const item = inventory.find(i => i.id === loan.itemId);
+                const today = new Date().setHours(0,0,0,0);
+                const returnDate = new Date(loan.returnDate).setHours(0,0,0,0);
+                const isOverdue = returnDate < today && loan.status === 'Dipinjam';
+                const dateClass = isOverdue ? 'overdue-text' : '';
+                
+                let statusBadge;
+                if (loan.status === 'Dipinjam') {
+                    statusBadge = `<span class="bg-yellow-500 text-yellow-900 text-xs font-semibold px-2.5 py-0.5 rounded-full">Dipinjam</span>`;
+                } else {
+                    statusBadge = `<span class="bg-green-500 text-green-900 text-xs font-semibold px-2.5 py-0.5 rounded-full">Dikembalikan</span>`;
+                }
+
+                let conditionText = loan.returnCondition ? loan.returnCondition : '-';
+                if(loan.returnCondition === 'Rusak Ringan') conditionText = `<span class="text-yellow-400 font-semibold">${loan.returnCondition}</span>`;
+                if(loan.returnCondition === 'Rusak Berat' || loan.returnCondition === 'Hilang') conditionText = `<span class="text-red-400 font-bold">${loan.returnCondition}</span>`;
+
+                const row = `
+                    <tr class="border-b border-gray-700">
+                        <td class="py-3 px-4 font-medium">${loan.borrowerName} <span class="text-gray-400 text-sm">(${loan.className})</span></td>
+                        <td class="py-3 px-4 text-yellow-300">${item ? item.name : 'Barang Dihapus'} (x${loan.quantity})</td>
+                        <td class="py-3 px-4 ${dateClass}">${loan.returnDate} ${isOverdue ? '(OVERDRIVE!)' : ''}</td>
+                        <td class="py-3 px-4">${statusBadge}</td>
+                        <td class="py-3 px-4">${conditionText}</td>
+                        <td class="py-3 px-4">
+                            ${loan.status === 'Dipinjam' ? `<button data-loanid="${loan.loanId}" class="return-item-btn bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Tandai Kembali</button>` : '-'}
+                        </td>
+                    </tr>
+                `;
+                loanHistoryTable.innerHTML += row;
+            });
+        }
+        
+        function renderUserInventory() {
+            userInventoryTable.innerHTML = '';
+            inventory.forEach(item => {
+                const available = item.total - item.borrowed;
+                const isAvailable = available > 0;
+                const statusClass = isAvailable ? 'bg-green-500 text-green-900' : 'bg-red-500 text-red-900';
+                const statusText = isAvailable ? 'Tersedia' : 'Dipinjam Penuh';
+                
+                const row = `
+                    <tr class="border-b border-gray-700">
+                        <td class="py-3 px-4">${item.code}</td>
+                        <td class="py-3 px-4 font-medium text-yellow-300">${item.name}</td>
+                        <td class="py-3 px-4"><span class="text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full ${statusClass}">${statusText}</span></td>
+                        <td class="py-3 px-4">${available} dari ${item.total}</td>
+                        <td class="py-3 px-4">
+                            <button data-id="${item.id}" class="borrow-item-btn jojo-button text-xs font-bold px-3 py-1 rounded-full" ${!isAvailable ? 'disabled' : ''} ${!isAvailable ? 'style="opacity:0.5; cursor:not-allowed"' : ''}>
+                                Pinjam
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                userInventoryTable.innerHTML += row;
+            });
+        }
+        
+        function renderMyLoans() {
+            myLoansTable.innerHTML = '';
+            const myActiveLoans = loans.filter(l => l.borrowerName.toLowerCase() === currentUser.toLowerCase() && l.status === 'Dipinjam');
+
+            if (myActiveLoans.length === 0) {
+                 myLoansTable.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">Anda tidak sedang meminjam barang.</td></tr>';
+                 return;
+            }
+
+            myActiveLoans.forEach(loan => {
+                const item = inventory.find(i => i.id === loan.itemId);
+                const row = `
+                     <tr class="border-b border-gray-700">
+                        <td class="py-3 px-4 font-medium text-yellow-300">${item ? item.name : 'Barang Dihapus'}</td>
+                        <td class="py-3 px-4 font-semibold">${loan.quantity}</td>
+                        <td class="py-3 px-4">${loan.className}</td>
+                        <td class="py-3 px-4">${loan.loanDate}</td>
+                        <td class="py-3 px-4">${loan.returnDate}</td>
+                        <td class="py-3 px-4"><span class="bg-yellow-500 text-yellow-900 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">Dipinjam</span></td>
+                    </tr>
+                `;
+                myLoansTable.innerHTML += row;
+            });
+        }
+
+        // === FUNGSI LOGIC ===
+        
+        function updateAllViews() {
+            if (currentUser === 'admin') {
+                renderAdminInventory();
+                renderLoanHistory();
+            } else if (currentUser) {
+                renderUserInventory();
+                renderMyLoans();
+            }
+        }
+        
+        function populateUserSelect() {
+            userSelect.innerHTML = '<option value="" disabled selected>Pilih nama...</option>';
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.username;
+                option.textContent = user.username;
+                userSelect.appendChild(option);
+            });
+        }
+
+        roleDropdown.addEventListener('change', () => {
+            if (roleDropdown.value === 'user') {
+                usernameLabel.textContent = 'Pilih Nama Anda';
+                usernameLabel.setAttribute('for', 'username-select');
+                userSelect.classList.remove('hidden');
+                adminUsernameInput.classList.add('hidden');
+            } else { // admin
+                usernameLabel.textContent = 'Username';
+                usernameLabel.setAttribute('for', 'admin-username-input');
+                userSelect.classList.add('hidden');
+                adminUsernameInput.classList.remove('hidden');
+            }
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const role = roleDropdown.value;
+            const password = e.target.password.value;
+            let username;
+
+            if (role === 'user') {
+                username = userSelect.value;
+            } else { // admin
+                username = adminUsernameInput.value;
+            }
+            
+            loginError.textContent = '';
+            
+            if (role === 'admin' && username === 'admin' && password === 'admin123') {
+                currentUser = 'admin';
+                loginPage.classList.add('hidden');
+                adminPage.classList.remove('hidden');
+                updateAllViews();
+            } else if (role === 'user') {
+                 if (!username) {
+                    loginError.textContent = 'Silakan pilih nama Anda!';
+                    return;
+                }
+                const foundUser = users.find(user => user.username === username && user.password === password);
+                if (foundUser) {
+                    currentUser = foundUser.username;
+                    userNameSpan.textContent = foundUser.username;
+                    borrowerNameInput.value = foundUser.username;
+                    loginPage.classList.add('hidden');
+                    userPage.classList.remove('hidden');
+                    updateAllViews();
+                } else {
+                    loginError.textContent = 'WRYYYYY! Password salah!';
+                }
+            } else {
+                 loginError.textContent = 'WRYYYYY! Username atau Password salah!';
+            }
+        });
+
+        function logout() {
+            currentUser = null;
+            adminPage.classList.add('hidden');
+            userPage.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+            loginForm.reset();
+            // Reset ke tampilan default user login
+            roleDropdown.value = 'user';
+            roleDropdown.dispatchEvent(new Event('change'));
+        }
+        adminLogoutBtn.addEventListener('click', logout);
+        userLogoutBtn.addEventListener('click', logout);
+
+        addItemForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newItem = {
+                id: inventory.length > 0 ? Math.max(...inventory.map(i => i.id)) + 1 : 1,
+                code: e.target.itemCode.value,
+                name: e.target.itemName.value,
+                total: parseInt(e.target.itemTotal.value),
+                borrowed: 0
+            };
+            inventory.push(newItem);
+            updateAllViews();
+            addItemForm.reset();
+        });
+
+        adminPage.addEventListener('click', e => {
+            if (e.target.classList.contains('delete-item-btn')) {
+                const itemId = parseInt(e.target.dataset.id);
+                const itemInLoan = loans.some(loan => loan.itemId === itemId && loan.status === 'Dipinjam');
+                if (itemInLoan) {
+                    alert('Barang tidak dapat dihapus karena sedang ada yang meminjam.');
+                    return;
+                }
+                if (confirm('Apakah Anda yakin ingin menghapus barang ini?')) {
+                    inventory = inventory.filter(i => i.id !== itemId);
+                    updateAllViews();
+                }
+            }
+            if (e.target.classList.contains('return-item-btn')) {
+                const loanId = parseInt(e.target.dataset.loanid);
+                const loan = loans.find(l => l.loanId === loanId);
+                const item = inventory.find(i => i.id === loan.itemId);
+                if(loan && item){
+                    returnModalLoanId.value = loanId;
+                    returnModalInfo.textContent = `${item.name} (x${loan.quantity}) oleh ${loan.borrowerName}`;
+                    returnModal.classList.remove('hidden');
+                }
+            }
+        });
+
+        userInventoryTable.addEventListener('click', e => {
+            if (e.target.classList.contains('borrow-item-btn')) {
+                const itemId = parseInt(e.target.dataset.id);
+                const item = inventory.find(i => i.id === itemId);
+                if (item) {
+                    modalItemId.value = item.id;
+                    modalItemName.textContent = item.name;
+
+                    const available = item.total - item.borrowed;
+                    loanQuantityInput.max = available;
+                    loanQuantityInput.value = 1;
+                    
+                    const today = new Date();
+                    const defaultReturnDate = new Date();
+                    defaultReturnDate.setDate(today.getDate() + 7);
+                    
+                    const todayString = today.toISOString().split('T')[0];
+                    const defaultReturnString = defaultReturnDate.toISOString().split('T')[0];
+
+                    returnDateInput.min = todayString;
+                    returnDateInput.value = defaultReturnString;
+
+                    loanModal.classList.remove('hidden');
+                }
+            }
+        });
+        
+        closeModalBtn.addEventListener('click', () => {
+            loanModal.classList.add('hidden');
+            loanForm.reset();
+            borrowerNameInput.value = currentUser;
+        });
+        
+        closeReturnModalBtn.addEventListener('click', () => {
+            returnModal.classList.add('hidden');
+            returnForm.reset();
+        });
+
+
+        loanForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const itemId = parseInt(modalItemId.value);
+            const borrowerName = borrowerNameInput.value;
+            const className = borrowerClassInput.value;
+            const returnDate = returnDateInput.value;
+            const quantity = parseInt(loanQuantityInput.value);
+            
+            const item = inventory.find(i => i.id === itemId);
+            const available = item.total - item.borrowed;
+
+            if (quantity <= 0) {
+                alert('Jumlah pinjam harus lebih dari 0.');
+                return;
+            }
+
+            if(item && quantity <= available) {
+                item.borrowed += quantity;
+                const newLoan = {
+                    loanId: loans.length > 0 ? Math.max(...loans.map(l => l.loanId)) + 1 : 1,
+                    itemId: itemId,
+                    borrowerName: borrowerName,
+                    className: className,
+                    quantity: quantity,
+                    loanDate: new Date().toISOString().split('T')[0],
+                    returnDate: returnDate,
+                    status: 'Dipinjam',
+                    returnCondition: null
+                };
+                loans.push(newLoan);
+                // currentUser tidak perlu diubah karena sudah login
+                updateAllViews();
+                loanModal.classList.add('hidden');
+                loanForm.reset();
+                borrowerNameInput.value = currentUser;
+
+            } else {
+                alert(`Maaf, jumlah barang tidak mencukupi. Tersedia: ${available}`);
+                loanModal.classList.add('hidden');
+                updateAllViews();
+            }
+        });
+
+        returnForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const loanId = parseInt(returnModalLoanId.value);
+            const condition = returnConditionSelect.value;
+            
+            const loan = loans.find(l => l.loanId === loanId);
+            if (loan) {
+                const item = inventory.find(i => i.id === loan.itemId);
+                if (item && condition !== 'Hilang') {
+                    item.borrowed -= loan.quantity;
+                }
+                loan.status = 'Dikembalikan';
+                loan.returnCondition = condition;
+                updateAllViews();
+                returnModal.classList.add('hidden');
+            }
+        });
+
+        // Inisialisasi tampilan login
+        populateUserSelect();
+    });
+    </script>
+</body>
+</html>
+
