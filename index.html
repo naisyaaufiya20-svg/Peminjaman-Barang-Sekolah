@@ -84,6 +84,10 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
+        .notification-box {
+            background-color: rgba(233, 69, 96, 0.1);
+            border-left: 4px solid var(--accent-pink);
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -144,6 +148,39 @@
                 </button>
             </div>
 
+            <!-- Manajemen Pengguna -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="jojo-card p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4 jojo-header">Tambah Pengguna Baru</h2>
+                    <form id="addUserForm" class="space-y-4">
+                        <div>
+                            <label for="newUsername" class="block text-sm font-medium text-gray-300">Nama Pengguna Baru</label>
+                            <input type="text" id="newUsername" required class="jojo-input mt-1 w-full p-2 rounded-md">
+                        </div>
+                        <div>
+                            <label for="newUserPassword" class="block text-sm font-medium text-gray-300">Password Awal</label>
+                            <input type="text" id="newUserPassword" required class="jojo-input mt-1 w-full p-2 rounded-md">
+                        </div>
+                        <button type="submit" class="jojo-button w-full py-2 px-4 rounded-lg">Tambah Pengguna</button>
+                    </form>
+                </div>
+                <div class="jojo-card p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4 jojo-header">Daftar Pengguna</h2>
+                    <div class="overflow-y-auto max-h-60">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th class="py-2 px-3 text-left text-xs font-semibold text-gray-300 tracking-wider">Username</th>
+                                    <th class="py-2 px-3 text-left text-xs font-semibold text-gray-300 tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userListTable" class="text-gray-300"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
             <div class="jojo-card p-6 rounded-xl shadow-lg">
                 <h2 class="text-xl font-semibold mb-4 jojo-header">Tambah Inventaris Baru</h2>
                 <form id="addItemForm" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
@@ -192,7 +229,7 @@
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Barang</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Tgl Kembali</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Status</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Kondisi Kembali</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Kondisi & Konsekuensi</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Aksi</th>
                             </tr>
                         </thead>
@@ -214,6 +251,10 @@
                 </button>
             </div>
 
+            <!-- Kotak Notifikasi Konsekuensi -->
+            <div id="userNotifications" class="hidden"></div>
+
+
             <div class="jojo-card p-6 rounded-xl shadow-lg">
                 <h2 class="text-xl font-semibold mb-4 jojo-header">Daftar Barang Tersedia</h2>
                 <div class="overflow-x-auto">
@@ -233,17 +274,17 @@
             </div>
 
             <div class="jojo-card p-6 rounded-xl shadow-lg">
-                <h2 class="text-xl font-semibold mb-4 jojo-header">Barang yang Sedang Saya Pinjam</h2>
+                <h2 class="text-xl font-semibold mb-4 jojo-header">Riwayat Peminjaman Saya</h2>
                 <div class="overflow-x-auto">
                     <table class="min-w-full">
                          <thead>
                             <tr>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Nama Barang</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Jumlah</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Kelas</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Tanggal Pinjam</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Tanggal Kembali</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Status</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Konsekuensi</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-300 tracking-wider">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="myLoansTable" class="text-gray-300"></tbody>
@@ -343,11 +384,11 @@
         ];
 
         let loans = [
-            { loanId: 1, itemId: 1, borrowerName: 'Budi Santoso', className: 'XII IPA 1', quantity: 1, loanDate: '2025-09-15', returnDate: '2025-09-22', status: 'Dipinjam', returnCondition: null },
-            { loanId: 2, itemId: 3, borrowerName: 'Citra Lestari', className: 'XI IPS 3', quantity: 1, loanDate: '2025-09-16', returnDate: '2025-09-18', status: 'Dipinjam', returnCondition: null },
-            { loanId: 3, itemId: 1, borrowerName: 'Ahmad Dahlan', className: 'Guru', quantity: 1, loanDate: '2025-09-10', returnDate: '2025-09-12', status: 'Dipinjam', returnCondition: null },
-            { loanId: 4, itemId: 2, borrowerName: 'Dewi Anjani', className: 'XII BAHASA', quantity: 5, loanDate: '2025-09-14', returnDate: '2025-09-21', status: 'Dikembalikan', returnCondition: 'Baik' },
-            { loanId: 5, itemId: 2, borrowerName: 'Eka Wijaya', className: 'X-A', quantity: 8, loanDate: '2025-09-17', returnDate: '2025-09-24', status: 'Dipinjam', returnCondition: null },
+            { loanId: 1, itemId: 1, borrowerName: 'Budi Santoso', className: 'XII IPA 1', quantity: 1, loanDate: '2025-09-15', returnDate: '2025-09-22', status: 'Dipinjam', returnCondition: null, finalConsequence: null, dendaStatus: null },
+            { loanId: 2, itemId: 3, borrowerName: 'Citra Lestari', className: 'XI IPS 3', quantity: 1, loanDate: '2025-10-01', returnDate: '2025-10-07', status: 'Dipinjam', returnCondition: null, finalConsequence: null, dendaStatus: null },
+            { loanId: 3, itemId: 1, borrowerName: 'Ahmad Dahlan', className: 'Guru', quantity: 1, loanDate: '2025-09-28', returnDate: '2025-10-05', status: 'Dipinjam', returnCondition: null, finalConsequence: null, dendaStatus: null },
+            { loanId: 4, itemId: 2, borrowerName: 'Dewi Anjani', className: 'XII BAHASA', quantity: 5, loanDate: '2025-09-14', returnDate: '2025-09-21', status: 'Dikembalikan', returnCondition: 'Baik', finalConsequence: 'Tidak ada', dendaStatus: 'Lunas' },
+            { loanId: 5, itemId: 2, borrowerName: 'Eka Wijaya', className: 'X-A', quantity: 8, loanDate: '2025-09-17', returnDate: '2025-09-24', status: 'Dikembalikan', returnCondition: 'Rusak Ringan', finalConsequence: 'Denda Kerusakan: Rp50.000', dendaStatus: 'Belum Dibayar' },
         ];
 
         let users = [
@@ -359,6 +400,7 @@
         ];
         
         let currentUser = null;
+        const today = new Date('2025-10-08');
 
         // === Referensi Elemen DOM ===
         const loginPage = document.getElementById('loginPage');
@@ -375,11 +417,14 @@
         const addItemForm = document.getElementById('addItemForm');
         const adminInventoryTable = document.getElementById('adminInventoryTable');
         const loanHistoryTable = document.getElementById('loanHistoryTable');
+        const addUserForm = document.getElementById('addUserForm');
+        const userListTable = document.getElementById('userListTable');
 
         const userLogoutBtn = document.getElementById('userLogoutBtn');
         const userInventoryTable = document.getElementById('userInventoryTable');
         const myLoansTable = document.getElementById('myLoansTable');
         const userNameSpan = document.getElementById('userName');
+        const userNotifications = document.getElementById('userNotifications');
 
         const loanModal = document.getElementById('loanModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -430,13 +475,14 @@
 
             sortedLoans.forEach(loan => {
                 const item = inventory.find(i => i.id === loan.itemId);
-                const today = new Date().setHours(0,0,0,0);
-                const returnDate = new Date(loan.returnDate).setHours(0,0,0,0);
+                const returnDate = new Date(loan.returnDate);
                 const isOverdue = returnDate < today && loan.status === 'Dipinjam';
                 const dateClass = isOverdue ? 'overdue-text' : '';
                 
                 let statusBadge;
-                if (loan.status === 'Dipinjam') {
+                if(loan.status === 'Menunggu Konfirmasi') {
+                     statusBadge = `<span class="bg-cyan-500 text-cyan-900 text-xs font-semibold px-2.5 py-0.5 rounded-full">Menunggu Konfirmasi</span>`;
+                } else if (loan.status === 'Dipinjam') {
                     statusBadge = `<span class="bg-yellow-500 text-yellow-900 text-xs font-semibold px-2.5 py-0.5 rounded-full">Dipinjam</span>`;
                 } else {
                     statusBadge = `<span class="bg-green-500 text-green-900 text-xs font-semibold px-2.5 py-0.5 rounded-full">Dikembalikan</span>`;
@@ -445,6 +491,22 @@
                 let conditionText = loan.returnCondition ? loan.returnCondition : '-';
                 if(loan.returnCondition === 'Rusak Ringan') conditionText = `<span class="text-yellow-400 font-semibold">${loan.returnCondition}</span>`;
                 if(loan.returnCondition === 'Rusak Berat' || loan.returnCondition === 'Hilang') conditionText = `<span class="text-red-400 font-bold">${loan.returnCondition}</span>`;
+                
+                let finalConsequenceText = loan.finalConsequence || (isOverdue ? 'Menunggu Konfirmasi' : '-');
+                if (loan.dendaStatus === 'Menunggu Konfirmasi Pembayaran') {
+                    finalConsequenceText += ` <span class="text-cyan-400">(Menunggu Konfirmasi Bayar)</span>`;
+                } else if (loan.dendaStatus === 'Lunas' && loan.finalConsequence !== 'Tidak ada') {
+                     finalConsequenceText += ` <span class="text-green-400">(Lunas)</span>`;
+                }
+
+
+                let actionButtons = '';
+                if (loan.status === 'Dipinjam' || loan.status === 'Menunggu Konfirmasi') {
+                    actionButtons += `<button data-loanid="${loan.loanId}" class="return-item-btn bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-1 w-full">Konfirmasi Kembali</button>`;
+                }
+                 if (loan.dendaStatus === 'Menunggu Konfirmasi Pembayaran') {
+                    actionButtons += `<button data-loanid="${loan.loanId}" class="confirm-payment-admin-btn bg-green-700 hover:bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full w-full">Konfirmasi Bayar</button>`;
+                }
 
                 const row = `
                     <tr class="border-b border-gray-700">
@@ -452,9 +514,12 @@
                         <td class="py-3 px-4 text-yellow-300">${item ? item.name : 'Barang Dihapus'} (x${loan.quantity})</td>
                         <td class="py-3 px-4 ${dateClass}">${loan.returnDate} ${isOverdue ? '(OVERDRIVE!)' : ''}</td>
                         <td class="py-3 px-4">${statusBadge}</td>
-                        <td class="py-3 px-4">${conditionText}</td>
                         <td class="py-3 px-4">
-                            ${loan.status === 'Dipinjam' ? `<button data-loanid="${loan.loanId}" class="return-item-btn bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Tandai Kembali</button>` : '-'}
+                            <div>${conditionText}</div>
+                            <div class="text-sm text-pink-400">${finalConsequenceText}</div>
+                        </td>
+                        <td class="py-3 px-4">
+                            ${actionButtons || '-'}
                         </td>
                     </tr>
                 `;
@@ -489,26 +554,90 @@
         
         function renderMyLoans() {
             myLoansTable.innerHTML = '';
-            const myActiveLoans = loans.filter(l => l.borrowerName.toLowerCase() === currentUser.toLowerCase() && l.status === 'Dipinjam');
+            userNotifications.innerHTML = '';
+            let notificationMessages = [];
 
-            if (myActiveLoans.length === 0) {
-                 myLoansTable.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">Anda tidak sedang meminjam barang.</td></tr>';
+            const myAllLoans = loans.filter(l => l.borrowerName.toLowerCase() === currentUser.toLowerCase());
+
+            if (myAllLoans.length === 0) {
+                 myLoansTable.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">Anda tidak memiliki riwayat peminjaman.</td></tr>';
+                 userNotifications.classList.add('hidden');
                  return;
             }
 
-            myActiveLoans.forEach(loan => {
+            myAllLoans.forEach(loan => {
                 const item = inventory.find(i => i.id === loan.itemId);
+                const returnDate = new Date(loan.returnDate);
+                const isOverdue = returnDate < today && loan.status === 'Dipinjam';
+                let consequenceText = loan.finalConsequence || '-';
+                
+                if (isOverdue) {
+                    consequenceText = '<span class="overdue-text">Denda Terlambat: Rp10.000</span>';
+                    notificationMessages.push({loanId: loan.loanId, message: `Anda memiliki denda keterlambatan Rp10.000 untuk peminjaman ${item.name}.`, dendaStatus: 'Belum Dibayar' });
+                } else if (loan.finalConsequence && loan.dendaStatus === 'Belum Dibayar') {
+                     notificationMessages.push({loanId: loan.loanId, message: `Anda memiliki konsekuensi "${loan.finalConsequence}" untuk pengembalian ${item.name}.`, dendaStatus: loan.dendaStatus});
+                }
+                
+                let statusBadge;
+                if(loan.status === 'Menunggu Konfirmasi') {
+                     statusBadge = `<span class="bg-cyan-500 text-cyan-900 text-xs font-semibold px-2.5 py-0.5 rounded-full">Menunggu Konfirmasi</span>`;
+                } else if (loan.status === 'Dipinjam') {
+                    statusBadge = `<span class="bg-yellow-500 text-yellow-900 text-xs font-semibold px-2.5 py-0.5 rounded-full">Dipinjam</span>`;
+                } else {
+                    statusBadge = `<span class="bg-green-500 text-green-900 text-xs font-semibold px-2.5 py-0.5 rounded-full">Dikembalikan</span>`;
+                }
+                
+                let actionButton = '';
+                if(loan.status === 'Dipinjam') {
+                    actionButton = `<button data-loanid="${loan.loanId}" class="request-return-btn jojo-button text-xs font-bold px-3 py-1 rounded-full">Ajukan Pengembalian</button>`;
+                } else if (loan.dendaStatus === 'Belum Dibayar') {
+                    actionButton = `<button data-loanid="${loan.loanId}" class="confirm-payment-btn jojo-button jojo-button-alt text-xs font-bold px-3 py-1 rounded-full">Konfirmasi Pembayaran</button>`;
+                }
+
                 const row = `
                      <tr class="border-b border-gray-700">
                         <td class="py-3 px-4 font-medium text-yellow-300">${item ? item.name : 'Barang Dihapus'}</td>
                         <td class="py-3 px-4 font-semibold">${loan.quantity}</td>
-                        <td class="py-3 px-4">${loan.className}</td>
-                        <td class="py-3 px-4">${loan.loanDate}</td>
-                        <td class="py-3 px-4">${loan.returnDate}</td>
-                        <td class="py-3 px-4"><span class="bg-yellow-500 text-yellow-900 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">Dipinjam</span></td>
+                        <td class="py-3 px-4 ${isOverdue ? 'overdue-text' : ''}">${loan.returnDate}</td>
+                        <td class="py-3 px-4">${statusBadge}</td>
+                        <td class="py-3 px-4">${consequenceText} ${loan.dendaStatus === 'Lunas' ? '<span class="text-green-400">(Lunas)</span>' : ''}</td>
+                        <td class="py-3 px-4">${actionButton || '-'}</td>
                     </tr>
                 `;
                 myLoansTable.innerHTML += row;
+            });
+            
+            if (notificationMessages.length > 0) {
+                userNotifications.classList.remove('hidden');
+                userNotifications.innerHTML = `
+                    <div class="notification-box p-4 rounded-lg">
+                        <h3 class="font-bold text-lg text-pink-300">PERHATIAN!</h3>
+                        <ul class="list-disc list-inside mt-2 text-pink-200 space-y-2">
+                            ${notificationMessages.map(n => `
+                                <li class="flex justify-between items-center">
+                                    <span>${n.message}</span>
+                                    ${n.dendaStatus === 'Belum Dibayar' ? `<button data-loanid="${n.loanId}" class="confirm-payment-btn jojo-button jojo-button-alt text-xs font-bold px-3 py-1 rounded-full">Konfirmasi Pembayaran</button>` : ''}
+                                </li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                userNotifications.classList.add('hidden');
+            }
+        }
+
+        function renderUserList() {
+            userListTable.innerHTML = '';
+            users.forEach(user => {
+                const row = `
+                    <tr class="border-b border-gray-700">
+                        <td class="py-2 px-3">${user.username}</td>
+                        <td class="py-2 px-3">
+                            <button data-username="${user.username}" class="delete-user-btn bg-red-800 text-red-100 text-xs font-semibold px-2.5 py-0.5 rounded-full hover:bg-red-600">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+                userListTable.innerHTML += row;
             });
         }
 
@@ -518,6 +647,7 @@
             if (currentUser === 'admin') {
                 renderAdminInventory();
                 renderLoanHistory();
+                renderUserList();
             } else if (currentUser) {
                 renderUserInventory();
                 renderMyLoans();
@@ -594,12 +724,29 @@
             userPage.classList.add('hidden');
             loginPage.classList.remove('hidden');
             loginForm.reset();
-            // Reset ke tampilan default user login
             roleDropdown.value = 'user';
             roleDropdown.dispatchEvent(new Event('change'));
         }
         adminLogoutBtn.addEventListener('click', logout);
         userLogoutBtn.addEventListener('click', logout);
+        
+        addUserForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const newUsername = document.getElementById('newUsername').value;
+            const newUserPassword = document.getElementById('newUserPassword').value;
+
+            if (users.some(user => user.username.toLowerCase() === newUsername.toLowerCase())) {
+                alert('Nama pengguna sudah ada!');
+                return;
+            }
+
+            users.push({ username: newUsername, password: newUserPassword });
+            alert(`Pengguna "${newUsername}" berhasil ditambahkan.`);
+            addUserForm.reset();
+            renderUserList();
+            populateUserSelect();
+        });
+
 
         addItemForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -638,10 +785,35 @@
                     returnModal.classList.remove('hidden');
                 }
             }
+            if(e.target.classList.contains('delete-user-btn')) {
+                const usernameToDelete = e.target.dataset.username;
+                const userHasActiveLoan = loans.some(loan => loan.borrowerName === usernameToDelete && loan.status === 'Dipinjam');
+
+                if (userHasActiveLoan) {
+                    alert(`Pengguna "${usernameToDelete}" tidak bisa dihapus karena masih memiliki pinjaman aktif.`);
+                    return;
+                }
+
+                if (confirm(`Apakah Anda yakin ingin menghapus pengguna "${usernameToDelete}"?`)) {
+                    users = users.filter(user => user.username !== usernameToDelete);
+                    renderUserList();
+                    populateUserSelect();
+                    alert(`Pengguna "${usernameToDelete}" berhasil dihapus.`);
+                }
+            }
+            if(e.target.classList.contains('confirm-payment-admin-btn')) {
+                const loanId = parseInt(e.target.dataset.loanid);
+                const loan = loans.find(l => l.loanId === loanId);
+                if(loan) {
+                    loan.dendaStatus = 'Lunas';
+                    alert('Pembayaran denda telah dikonfirmasi.');
+                    updateAllViews();
+                }
+            }
         });
 
-        userInventoryTable.addEventListener('click', e => {
-            if (e.target.classList.contains('borrow-item-btn')) {
+        userPage.addEventListener('click', e => {
+             if (e.target.classList.contains('borrow-item-btn')) {
                 const itemId = parseInt(e.target.dataset.id);
                 const item = inventory.find(i => i.id === itemId);
                 if (item) {
@@ -652,20 +824,35 @@
                     loanQuantityInput.max = available;
                     loanQuantityInput.value = 1;
                     
-                    const today = new Date();
-                    const defaultReturnDate = new Date();
-                    defaultReturnDate.setDate(today.getDate() + 7);
+                    const minReturnDate = new Date(today);
+                    minReturnDate.setDate(minReturnDate.getDate() + 1); // Besok
+                    const defaultReturnDate = new Date(today);
+                    defaultReturnDate.setDate(defaultReturnDate.getDate() + 7);
                     
-                    const todayString = today.toISOString().split('T')[0];
-                    const defaultReturnString = defaultReturnDate.toISOString().split('T')[0];
-
-                    returnDateInput.min = todayString;
-                    returnDateInput.value = defaultReturnString;
+                    returnDateInput.min = minReturnDate.toISOString().split('T')[0];
+                    returnDateInput.value = defaultReturnDate.toISOString().split('T')[0];
 
                     loanModal.classList.remove('hidden');
                 }
             }
-        });
+            if (e.target.classList.contains('request-return-btn')) {
+                const loanId = parseInt(e.target.dataset.loanid);
+                const loan = loans.find(l => l.loanId === loanId);
+                if (loan) {
+                    loan.status = 'Menunggu Konfirmasi';
+                    updateAllViews();
+                }
+            }
+            if (e.target.classList.contains('confirm-payment-btn')) {
+                const loanId = parseInt(e.target.dataset.loanid);
+                const loan = loans.find(l => l.loanId === loanId);
+                if (loan) {
+                    loan.dendaStatus = 'Menunggu Konfirmasi Pembayaran';
+                    alert('Konfirmasi pembayaran telah dikirim ke admin.');
+                    updateAllViews();
+                }
+            }
+        })
         
         closeModalBtn.addEventListener('click', () => {
             loanModal.classList.add('hidden');
@@ -703,13 +890,14 @@
                     borrowerName: borrowerName,
                     className: className,
                     quantity: quantity,
-                    loanDate: new Date().toISOString().split('T')[0],
+                    loanDate: today.toISOString().split('T')[0],
                     returnDate: returnDate,
                     status: 'Dipinjam',
-                    returnCondition: null
+                    returnCondition: null,
+                    finalConsequence: null,
+                    dendaStatus: null
                 };
                 loans.push(newLoan);
-                // currentUser tidak perlu diubah karena sudah login
                 updateAllViews();
                 loanModal.classList.add('hidden');
                 loanForm.reset();
@@ -729,6 +917,26 @@
             
             const loan = loans.find(l => l.loanId === loanId);
             if (loan) {
+                let consequences = [];
+                let hasDenda = false;
+                const returnDate = new Date(loan.returnDate);
+
+                if (returnDate < today) {
+                    consequences.push('Denda Terlambat: Rp10.000');
+                    hasDenda = true;
+                }
+
+                if (condition === 'Rusak Ringan') {
+                    consequences.push('Denda Kerusakan: Rp50.000');
+                    hasDenda = true;
+                } else if (condition === 'Rusak Berat' || condition === 'Hilang') {
+                    consequences.push('Wajib Ganti Baru!');
+                    hasDenda = true; // Anggap ini juga perlu konfirmasi
+                }
+
+                loan.finalConsequence = consequences.length > 0 ? consequences.join(', ') : 'Tidak ada';
+                loan.dendaStatus = hasDenda ? 'Belum Dibayar' : 'Lunas';
+                
                 const item = inventory.find(i => i.id === loan.itemId);
                 if (item && condition !== 'Hilang') {
                     item.borrowed -= loan.quantity;
@@ -742,6 +950,7 @@
 
         // Inisialisasi tampilan login
         populateUserSelect();
+        roleDropdown.dispatchEvent(new Event('change'));
     });
     </script>
 </body>
