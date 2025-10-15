@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Peminjaman Bizarre</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,72 +23,23 @@
             font-family: 'Jost', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-light);
-            /* Menacing Background */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 100 100'%3E%3Ctext x='10' y='60' font-size='50' fill='rgba(255,255,255,0.04)' font-family='serif' transform='rotate(-15 50 50)'%3Eゴゴゴ%3C/text%3E%3C/svg%3E");
         }
-        .jojo-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-        }
-        .jojo-header {
-            color: var(--accent-gold);
-            text-shadow: 0 0 5px rgba(247, 183, 51, 0.7);
-        }
-        .jojo-button {
-            background-color: var(--accent-gold);
-            color: var(--text-dark);
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-        .jojo-button:hover {
-            background-color: var(--text-light);
-            box-shadow: 0 0 15px var(--accent-gold);
-        }
-        .jojo-button-alt {
-            background-color: var(--accent-pink);
-            color: var(--text-light);
-        }
-        .jojo-button-alt:hover {
-            background-color: #ff7675;
-             box-shadow: 0 0 15px var(--accent-pink);
-        }
-        .jojo-input, .jojo-select {
-            background-color: var(--bg-dark);
-            border: 1px solid var(--border-color);
-            color: var(--text-light);
-        }
-        .jojo-input:focus, .jojo-select:focus {
-            --tw-ring-color: var(--accent-gold);
-            border-color: var(--accent-gold);
-        }
-        table thead {
-            background-color: rgba(15, 52, 96, 0.5);
-            text-transform: uppercase;
-        }
-        .fade-in {
-            animation: fadeIn 0.7s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .hidden {
-            display: none;
-        }
-        .overdue-text {
-            color: var(--accent-pink);
-            text-shadow: 0 0 8px var(--accent-pink);
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        .notification-box {
-            background-color: rgba(233, 69, 96, 0.1);
-            border-left: 4px solid var(--accent-pink);
-        }
+        .jojo-card { background-color: var(--bg-card); border: 1px solid var(--border-color); }
+        .jojo-header { color: var(--accent-gold); text-shadow: 0 0 5px rgba(247, 183, 51, 0.7); }
+        .jojo-button { background-color: var(--accent-gold); color: var(--text-dark); transition: all 0.3s ease; text-transform: uppercase; font-weight: 700; }
+        .jojo-button:hover { background-color: var(--text-light); box-shadow: 0 0 15px var(--accent-gold); }
+        .jojo-button-alt { background-color: var(--accent-pink); color: var(--text-light); }
+        .jojo-button-alt:hover { background-color: #ff7675; box-shadow: 0 0 15px var(--accent-pink); }
+        .jojo-input, .jojo-select { background-color: var(--bg-dark); border: 1px solid var(--border-color); color: var(--text-light); }
+        .jojo-input:focus, .jojo-select:focus { --tw-ring-color: var(--accent-gold); border-color: var(--accent-gold); }
+        table thead { background-color: rgba(15, 52, 96, 0.5); text-transform: uppercase; }
+        .fade-in { animation: fadeIn 0.7s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .hidden { display: none; }
+        .overdue-text { color: var(--accent-pink); text-shadow: 0 0 8px var(--accent-pink); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .notification-box { background-color: rgba(233, 69, 96, 0.1); border-left: 4px solid var(--accent-pink); }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -106,8 +58,7 @@
                     <form id="loginForm" class="mt-8 space-y-6">
                         <div>
                             <label for="role" class="block text-sm font-medium text-gray-300">Masuk sebagai</label>
-                            <select id="role" name="role"
-                                class="jojo-select mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-1 sm:text-sm rounded-md">
+                            <select id="role" name="role" class="jojo-select mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-1 sm:text-sm rounded-md">
                                 <option value="user">User (Siswa/Guru)</option>
                                 <option value="admin">Admin</option>
                             </select>
@@ -115,19 +66,17 @@
                         <div>
                             <label id="username-label" for="username-select" class="block text-sm font-medium text-gray-300">Pilih Nama Anda</label>
                             <select id="username-select" class="jojo-select mt-1 block w-full pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-1 sm:text-sm rounded-md">
-                                <!-- Opsi nama pengguna akan diisi oleh JavaScript -->
+                                <!-- Opsi akan diisi oleh JavaScript dari Supabase -->
                             </select>
                             <input type="text" id="admin-username-input" placeholder="admin" class="jojo-input mt-1 block w-full px-3 py-2 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-1 sm:text-sm hidden">
                         </div>
                         <div>
                             <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
-                            <input type="password" id="password" name="password" required
-                                class="jojo-input mt-1 block w-full px-3 py-2 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-1 sm:text-sm">
+                            <input type="password" id="password" name="password" required class="jojo-input mt-1 block w-full px-3 py-2 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-1 sm:text-sm">
                         </div>
                         <p id="loginError" class="text-red-400 text-sm text-center"></p>
                         <div>
-                            <button type="submit"
-                                class="jojo-button w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium">
+                            <button type="submit" class="jojo-button w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium">
                                 ORA ORA ORA! (Masuk)
                             </button>
                         </div>
@@ -136,6 +85,8 @@
             </div>
         </div>
 
+        <!-- HALAMAN LAINNYA (ADMIN & USER) DISIMPAN DI SINI -->
+        
         <!-- ===== HALAMAN ADMIN ===== -->
         <div id="adminPage" class="hidden fade-in space-y-8">
             <div class="flex justify-between items-center jojo-card p-4 rounded-xl shadow-lg">
@@ -251,9 +202,7 @@
                 </button>
             </div>
 
-            <!-- Kotak Notifikasi Konsekuensi -->
             <div id="userNotifications" class="hidden"></div>
-
 
             <div class="jojo-card p-6 rounded-xl shadow-lg">
                 <h2 class="text-xl font-semibold mb-4 jojo-header">Daftar Barang Tersedia</h2>
@@ -293,9 +242,9 @@
             </div>
         </div>
     </div>
-
-    <!-- ===== MODAL PEMINJAMAN ===== -->
-    <div id="loanModal" class="hidden fixed z-10 inset-0 overflow-y-auto">
+    
+    <!-- Modals -->
+     <div id="loanModal" class="hidden fixed z-10 inset-0 overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity" aria-hidden="true"><div class="absolute inset-0 bg-black opacity-75"></div></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -336,8 +285,6 @@
             </div>
         </div>
     </div>
-
-    <!-- ===== MODAL PENGEMBALIAN ===== -->
     <div id="returnModal" class="hidden fixed z-10 inset-0 overflow-y-auto">
          <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity" aria-hidden="true"><div class="absolute inset-0 bg-black opacity-75"></div></div>
@@ -372,35 +319,20 @@
             </div>
         </div>
     </div>
-    
+
+
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // === Simulasi Database ===
-        let inventory = [
-            { id: 1, code: 'PRJ-01', name: 'Proyektor BenQ', total: 5, borrowed: 2 },
-            { id: 2, code: 'MIC-05', name: 'Mikrofon Wireless', total: 10, borrowed: 8 },
-            { id: 3, code: 'SPK-02', name: 'Speaker Aktif', total: 4, borrowed: 1 },
-            { id: 4, code: 'KBL-15', name: 'Kabel HDMI 15m', total: 8, borrowed: 0 },
-        ];
-
-        let loans = [
-            { loanId: 1, itemId: 1, borrowerName: 'Budi Santoso', className: 'XII IPA 1', quantity: 1, loanDate: '2025-09-15', returnDate: '2025-09-22', status: 'Dipinjam', returnCondition: null, finalConsequence: null, dendaStatus: null },
-            { loanId: 2, itemId: 3, borrowerName: 'Citra Lestari', className: 'XI IPS 3', quantity: 1, loanDate: '2025-10-01', returnDate: '2025-10-07', status: 'Dipinjam', returnCondition: null, finalConsequence: null, dendaStatus: null },
-            { loanId: 3, itemId: 1, borrowerName: 'Ahmad Dahlan', className: 'Guru', quantity: 1, loanDate: '2025-09-28', returnDate: '2025-10-05', status: 'Dipinjam', returnCondition: null, finalConsequence: null, dendaStatus: null },
-            { loanId: 4, itemId: 2, borrowerName: 'Dewi Anjani', className: 'XII BAHASA', quantity: 5, loanDate: '2025-09-14', returnDate: '2025-09-21', status: 'Dikembalikan', returnCondition: 'Baik', finalConsequence: 'Tidak ada', dendaStatus: 'Lunas' },
-            { loanId: 5, itemId: 2, borrowerName: 'Eka Wijaya', className: 'X-A', quantity: 8, loanDate: '2025-09-17', returnDate: '2025-09-24', status: 'Dikembalikan', returnCondition: 'Rusak Ringan', finalConsequence: 'Denda Kerusakan: Rp50.000', dendaStatus: 'Belum Dibayar' },
-        ];
-
-        let users = [
-            { username: 'Budi Santoso', password: 'password123' },
-            { username: 'Citra Lestari', password: 'password456' },
-            { username: 'Ahmad Dahlan', password: 'password789' },
-            { username: 'Dewi Anjani', password: 'password101' },
-            { username: 'Eka Wijaya', password: 'password112' }
-        ];
+        // === KONFIGURASI SUPABASE ===
+        // GANTI DENGAN URL DAN KEY SUPABASE ANDA
+        const supabaseUrl = 'https://imfhvxcuabmrhfueopme.supabase.co'; 
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltZmh2eGN1YWJtcmhmdWVvcG1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAyODM1ODYsImV4cCI6MjA3NTg1OTU4Nn0.rz9EjAg5896kUqlWIJFcp4vhjeq0D7j9-s2UyQ2sMQE';
+        // ============================
         
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
         let currentUser = null;
-        const today = new Date('2025-10-08');
+        const today = new Date();
 
         // === Referensi Elemen DOM ===
         const loginPage = document.getElementById('loginPage');
@@ -412,20 +344,17 @@
         const userSelect = document.getElementById('username-select');
         const adminUsernameInput = document.getElementById('admin-username-input');
         const usernameLabel = document.getElementById('username-label');
-
         const adminLogoutBtn = document.getElementById('adminLogoutBtn');
         const addItemForm = document.getElementById('addItemForm');
         const adminInventoryTable = document.getElementById('adminInventoryTable');
         const loanHistoryTable = document.getElementById('loanHistoryTable');
         const addUserForm = document.getElementById('addUserForm');
         const userListTable = document.getElementById('userListTable');
-
         const userLogoutBtn = document.getElementById('userLogoutBtn');
         const userInventoryTable = document.getElementById('userInventoryTable');
         const myLoansTable = document.getElementById('myLoansTable');
         const userNameSpan = document.getElementById('userName');
         const userNotifications = document.getElementById('userNotifications');
-
         const loanModal = document.getElementById('loanModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
         const loanForm = document.getElementById('loanForm');
@@ -435,7 +364,6 @@
         const borrowerClassInput = document.getElementById('borrowerClass');
         const returnDateInput = document.getElementById('returnDate');
         const loanQuantityInput = document.getElementById('loanQuantity');
-
         const returnModal = document.getElementById('returnModal');
         const closeReturnModalBtn = document.getElementById('closeReturnModalBtn');
         const returnForm = document.getElementById('returnForm');
@@ -443,13 +371,15 @@
         const returnModalInfo = document.getElementById('returnModalInfo');
         const returnConditionSelect = document.getElementById('returnCondition');
 
-        // === FUNGSI RENDER ===
-        
-        function renderAdminInventory() {
+        // === Fungsi Render (Async) ===
+        async function renderAdminInventory() {
+            const { data: inventory, error } = await supabaseClient.from('inventory').select('*').order('name', { ascending: true });
+            if (error) { console.error('Error fetching inventory:', error); return; }
+
             adminInventoryTable.innerHTML = '';
             inventory.forEach(item => {
                 const available = item.total - item.borrowed;
-                const row = `
+                adminInventoryTable.innerHTML += `
                     <tr class="border-b border-gray-700">
                         <td class="py-3 px-4">${item.code}</td>
                         <td class="py-3 px-4 font-medium text-yellow-300">${item.name}</td>
@@ -459,26 +389,19 @@
                         <td class="py-3 px-4">
                             <button data-id="${item.id}" class="delete-item-btn bg-red-800 text-red-100 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full hover:bg-red-600">Hapus</button>
                         </td>
-                    </tr>
-                `;
-                adminInventoryTable.innerHTML += row;
+                    </tr>`;
             });
         }
-        
-        function renderLoanHistory() {
-            loanHistoryTable.innerHTML = '';
-            if (loans.length === 0) {
-                 loanHistoryTable.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">Belum ada riwayat peminjaman.</td></tr>';
-                 return;
-            }
-            const sortedLoans = [...loans].sort((a, b) => (a.status === 'Dipinjam' ? -1 : 1) - (b.status === 'Dipinjam' ? -1 : 1));
 
-            sortedLoans.forEach(loan => {
+        async function renderLoanHistory() {
+            const { data: loans, error: loanError } = await supabaseClient.from('loans').select('*').order('status', { ascending: true });
+            const { data: inventory, error: invError } = await supabaseClient.from('inventory').select('id, name');
+            if (loanError || invError) { console.error('Error fetching data:', loanError || invError); return; }
+
+            loanHistoryTable.innerHTML = '';
+            loans.forEach(loan => {
                 const item = inventory.find(i => i.id === loan.itemId);
-                const returnDate = new Date(loan.returnDate);
-                const isOverdue = returnDate < today && loan.status === 'Dipinjam';
-                const dateClass = isOverdue ? 'overdue-text' : '';
-                
+                const isOverdue = new Date(loan.returnDate) < today && loan.status === 'Dipinjam';
                 let statusBadge;
                 if(loan.status === 'Menunggu Konfirmasi') {
                      statusBadge = `<span class="bg-cyan-500 text-cyan-900 text-xs font-semibold px-2.5 py-0.5 rounded-full">Menunggu Konfirmasi</span>`;
@@ -499,20 +422,19 @@
                      finalConsequenceText += ` <span class="text-green-400">(Lunas)</span>`;
                 }
 
-
                 let actionButtons = '';
                 if (loan.status === 'Dipinjam' || loan.status === 'Menunggu Konfirmasi') {
-                    actionButtons += `<button data-loanid="${loan.loanId}" class="return-item-btn bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-1 w-full">Konfirmasi Kembali</button>`;
+                    actionButtons += `<button data-loanid="${loan.id}" class="return-item-btn bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-1 w-full">Konfirmasi Kembali</button>`;
                 }
                  if (loan.dendaStatus === 'Menunggu Konfirmasi Pembayaran') {
-                    actionButtons += `<button data-loanid="${loan.loanId}" class="confirm-payment-admin-btn bg-green-700 hover:bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full w-full">Konfirmasi Bayar</button>`;
+                    actionButtons += `<button data-loanid="${loan.id}" class="confirm-payment-admin-btn bg-green-700 hover:bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full w-full">Konfirmasi Bayar</button>`;
                 }
-
-                const row = `
+                
+                loanHistoryTable.innerHTML += `
                     <tr class="border-b border-gray-700">
                         <td class="py-3 px-4 font-medium">${loan.borrowerName} <span class="text-gray-400 text-sm">(${loan.className})</span></td>
                         <td class="py-3 px-4 text-yellow-300">${item ? item.name : 'Barang Dihapus'} (x${loan.quantity})</td>
-                        <td class="py-3 px-4 ${dateClass}">${loan.returnDate} ${isOverdue ? '(OVERDRIVE!)' : ''}</td>
+                        <td class="py-3 px-4 ${isOverdue ? 'overdue-text' : ''}">${loan.returnDate} ${isOverdue ? '(OVERDRIVE!)' : ''}</td>
                         <td class="py-3 px-4">${statusBadge}</td>
                         <td class="py-3 px-4">
                             <div>${conditionText}</div>
@@ -521,21 +443,38 @@
                         <td class="py-3 px-4">
                             ${actionButtons || '-'}
                         </td>
-                    </tr>
-                `;
-                loanHistoryTable.innerHTML += row;
+                    </tr>`;
             });
         }
         
-        function renderUserInventory() {
+        async function renderUserList() {
+             const { data: users, error } = await supabaseClient.from('users').select('*').order('username', { ascending: true });
+             if (error) { console.error('Error fetching users:', error); return; }
+
+             userListTable.innerHTML = '';
+             users.forEach(user => {
+                 userListTable.innerHTML += `
+                    <tr class="border-b border-gray-700">
+                        <td class="py-2 px-3">${user.username}</td>
+                        <td class="py-2 px-3">
+                            <button data-id="${user.id}" data-username="${user.username}" class="delete-user-btn bg-red-800 text-red-100 text-xs font-semibold px-2.5 py-0.5 rounded-full hover:bg-red-600">Hapus</button>
+                        </td>
+                    </tr>
+                 `;
+             });
+        }
+
+        async function renderUserInventory() {
+            const { data: inventory, error } = await supabaseClient.from('inventory').select('*').order('name', { ascending: true });
+            if (error) { console.error('Error fetching inventory:', error); return; }
+            
             userInventoryTable.innerHTML = '';
             inventory.forEach(item => {
                 const available = item.total - item.borrowed;
                 const isAvailable = available > 0;
                 const statusClass = isAvailable ? 'bg-green-500 text-green-900' : 'bg-red-500 text-red-900';
                 const statusText = isAvailable ? 'Tersedia' : 'Dipinjam Penuh';
-                
-                const row = `
+                userInventoryTable.innerHTML += `
                     <tr class="border-b border-gray-700">
                         <td class="py-3 px-4">${item.code}</td>
                         <td class="py-3 px-4 font-medium text-yellow-300">${item.name}</td>
@@ -546,36 +485,28 @@
                                 Pinjam
                             </button>
                         </td>
-                    </tr>
-                `;
-                userInventoryTable.innerHTML += row;
+                    </tr>`;
             });
         }
-        
-        function renderMyLoans() {
+
+        async function renderMyLoans() {
+            const { data: myAllLoans, error: loanError } = await supabaseClient.from('loans').select('*').eq('borrowerName', currentUser).order('status', { ascending: true });
+            const { data: inventory, error: invError } = await supabaseClient.from('inventory').select('id, name');
+            if (loanError || invError) { console.error('Error fetching data:', loanError || invError); return; }
+            
             myLoansTable.innerHTML = '';
             userNotifications.innerHTML = '';
             let notificationMessages = [];
-
-            const myAllLoans = loans.filter(l => l.borrowerName.toLowerCase() === currentUser.toLowerCase());
-
-            if (myAllLoans.length === 0) {
-                 myLoansTable.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">Anda tidak memiliki riwayat peminjaman.</td></tr>';
-                 userNotifications.classList.add('hidden');
-                 return;
-            }
-
             myAllLoans.forEach(loan => {
                 const item = inventory.find(i => i.id === loan.itemId);
-                const returnDate = new Date(loan.returnDate);
-                const isOverdue = returnDate < today && loan.status === 'Dipinjam';
+                const isOverdue = new Date(loan.returnDate) < today && loan.status === 'Dipinjam';
                 let consequenceText = loan.finalConsequence || '-';
                 
                 if (isOverdue) {
                     consequenceText = '<span class="overdue-text">Denda Terlambat: Rp10.000</span>';
-                    notificationMessages.push({loanId: loan.loanId, message: `Anda memiliki denda keterlambatan Rp10.000 untuk peminjaman ${item.name}.`, dendaStatus: 'Belum Dibayar' });
+                    notificationMessages.push({loanId: loan.id, message: `Anda memiliki denda keterlambatan Rp10.000 untuk peminjaman ${item.name}.`, dendaStatus: 'Belum Dibayar' });
                 } else if (loan.finalConsequence && loan.dendaStatus === 'Belum Dibayar') {
-                     notificationMessages.push({loanId: loan.loanId, message: `Anda memiliki konsekuensi "${loan.finalConsequence}" untuk pengembalian ${item.name}.`, dendaStatus: loan.dendaStatus});
+                     notificationMessages.push({loanId: loan.id, message: `Anda memiliki konsekuensi "${loan.finalConsequence}" untuk pengembalian ${item.name}.`, dendaStatus: loan.dendaStatus});
                 }
                 
                 let statusBadge;
@@ -589,12 +520,12 @@
                 
                 let actionButton = '';
                 if(loan.status === 'Dipinjam') {
-                    actionButton = `<button data-loanid="${loan.loanId}" class="request-return-btn jojo-button text-xs font-bold px-3 py-1 rounded-full">Ajukan Pengembalian</button>`;
+                    actionButton = `<button data-loanid="${loan.id}" class="request-return-btn jojo-button text-xs font-bold px-3 py-1 rounded-full">Ajukan Pengembalian</button>`;
                 } else if (loan.dendaStatus === 'Belum Dibayar') {
-                    actionButton = `<button data-loanid="${loan.loanId}" class="confirm-payment-btn jojo-button jojo-button-alt text-xs font-bold px-3 py-1 rounded-full">Konfirmasi Pembayaran</button>`;
+                    actionButton = `<button data-loanid="${loan.id}" class="confirm-payment-btn jojo-button jojo-button-alt text-xs font-bold px-3 py-1 rounded-full">Konfirmasi Pembayaran</button>`;
                 }
 
-                const row = `
+                myLoansTable.innerHTML += `
                      <tr class="border-b border-gray-700">
                         <td class="py-3 px-4 font-medium text-yellow-300">${item ? item.name : 'Barang Dihapus'}</td>
                         <td class="py-3 px-4 font-semibold">${loan.quantity}</td>
@@ -602,13 +533,10 @@
                         <td class="py-3 px-4">${statusBadge}</td>
                         <td class="py-3 px-4">${consequenceText} ${loan.dendaStatus === 'Lunas' ? '<span class="text-green-400">(Lunas)</span>' : ''}</td>
                         <td class="py-3 px-4">${actionButton || '-'}</td>
-                    </tr>
-                `;
-                myLoansTable.innerHTML += row;
+                    </tr>`;
             });
-            
             if (notificationMessages.length > 0) {
-                userNotifications.classList.remove('hidden');
+                 userNotifications.classList.remove('hidden');
                 userNotifications.innerHTML = `
                     <div class="notification-box p-4 rounded-lg">
                         <h3 class="font-bold text-lg text-pink-300">PERHATIAN!</h3>
@@ -626,69 +554,32 @@
             }
         }
 
-        function renderUserList() {
-            userListTable.innerHTML = '';
-            users.forEach(user => {
-                const row = `
-                    <tr class="border-b border-gray-700">
-                        <td class="py-2 px-3">${user.username}</td>
-                        <td class="py-2 px-3">
-                            <button data-username="${user.username}" class="delete-user-btn bg-red-800 text-red-100 text-xs font-semibold px-2.5 py-0.5 rounded-full hover:bg-red-600">Hapus</button>
-                        </td>
-                    </tr>
-                `;
-                userListTable.innerHTML += row;
-            });
-        }
-
-        // === FUNGSI LOGIC ===
-        
-        function updateAllViews() {
+        // === Fungsi Logic (Async) ===
+        async function updateAllViews() {
             if (currentUser === 'admin') {
-                renderAdminInventory();
-                renderLoanHistory();
-                renderUserList();
+                await renderAdminInventory();
+                await renderLoanHistory();
+                await renderUserList();
             } else if (currentUser) {
-                renderUserInventory();
-                renderMyLoans();
+                await renderUserInventory();
+                await renderMyLoans();
             }
         }
         
-        function populateUserSelect() {
+        async function populateUserSelect() {
+            const { data: users, error } = await supabaseClient.from('users').select('username').order('username');
+            if(error) { console.error(error); return; }
             userSelect.innerHTML = '<option value="" disabled selected>Pilih nama...</option>';
             users.forEach(user => {
-                const option = document.createElement('option');
-                option.value = user.username;
-                option.textContent = user.username;
-                userSelect.appendChild(option);
+                userSelect.innerHTML += `<option value="${user.username}">${user.username}</option>`;
             });
         }
 
-        roleDropdown.addEventListener('change', () => {
-            if (roleDropdown.value === 'user') {
-                usernameLabel.textContent = 'Pilih Nama Anda';
-                usernameLabel.setAttribute('for', 'username-select');
-                userSelect.classList.remove('hidden');
-                adminUsernameInput.classList.add('hidden');
-            } else { // admin
-                usernameLabel.textContent = 'Username';
-                usernameLabel.setAttribute('for', 'admin-username-input');
-                userSelect.classList.add('hidden');
-                adminUsernameInput.classList.remove('hidden');
-            }
-        });
-
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const role = roleDropdown.value;
             const password = e.target.password.value;
-            let username;
-
-            if (role === 'user') {
-                username = userSelect.value;
-            } else { // admin
-                username = adminUsernameInput.value;
-            }
+            let username = role === 'user' ? userSelect.value : adminUsernameInput.value;
             
             loginError.textContent = '';
             
@@ -696,20 +587,18 @@
                 currentUser = 'admin';
                 loginPage.classList.add('hidden');
                 adminPage.classList.remove('hidden');
-                updateAllViews();
+                await updateAllViews();
             } else if (role === 'user') {
-                 if (!username) {
-                    loginError.textContent = 'Silakan pilih nama Anda!';
-                    return;
-                }
-                const foundUser = users.find(user => user.username === username && user.password === password);
+                if (!username) { loginError.textContent = 'Silakan pilih nama Anda!'; return; }
+                const { data: foundUser, error } = await supabaseClient.from('users').select('*').eq('username', username).eq('password', password).single();
+                
                 if (foundUser) {
                     currentUser = foundUser.username;
                     userNameSpan.textContent = foundUser.username;
                     borrowerNameInput.value = foundUser.username;
                     loginPage.classList.add('hidden');
                     userPage.classList.remove('hidden');
-                    updateAllViews();
+                    await updateAllViews();
                 } else {
                     loginError.textContent = 'WRYYYYY! Password salah!';
                 }
@@ -718,6 +607,187 @@
             }
         });
 
+        addUserForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newUsername = document.getElementById('newUsername').value;
+            const newUserPassword = document.getElementById('newUserPassword').value;
+
+            const { error } = await supabaseClient.from('users').insert({ username: newUsername, password: newUserPassword });
+            if (error) {
+                alert('Gagal menambah pengguna: ' + error.message);
+            } else {
+                alert(`Pengguna "${newUsername}" berhasil ditambahkan.`);
+                addUserForm.reset();
+                await renderUserList();
+                await populateUserSelect();
+            }
+        });
+
+        addItemForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newItem = {
+                code: e.target.itemCode.value,
+                name: e.target.itemName.value,
+                total: parseInt(e.target.itemTotal.value),
+                borrowed: 0
+            };
+            const { error } = await supabaseClient.from('inventory').insert(newItem);
+            if (error) { alert('Gagal menambah barang: ' + error.message); }
+            else {
+                await updateAllViews();
+                addItemForm.reset();
+            }
+        });
+
+        adminPage.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('delete-user-btn')) {
+                const userId = parseInt(e.target.dataset.id);
+                const username = e.target.dataset.username;
+                const { data: loans, error } = await supabaseClient.from('loans').select('id').eq('borrowerName', username).in('status', ['Dipinjam', 'Menunggu Konfirmasi']);
+                
+                if (loans && loans.length > 0) {
+                    alert(`Pengguna "${username}" tidak bisa dihapus karena masih memiliki pinjaman aktif.`);
+                    return;
+                }
+
+                if (confirm(`Apakah Anda yakin ingin menghapus pengguna "${username}"?`)) {
+                    await supabaseClient.from('users').delete().eq('id', userId);
+                    alert(`Pengguna "${username}" berhasil dihapus.`);
+                    await updateAllViews();
+                    await populateUserSelect();
+                }
+            }
+            if (e.target.classList.contains('delete-item-btn')) {
+                const itemId = parseInt(e.target.dataset.id);
+                // Cek apakah item sedang dipinjam
+                const { data: loans, error } = await supabaseClient.from('loans').select('id').eq('itemId', itemId).in('status', ['Dipinjam', 'Menunggu Konfirmasi']);
+
+                if (loans && loans.length > 0) {
+                    alert('Barang ini tidak dapat dihapus karena sedang ada yang meminjam.');
+                    return;
+                }
+
+                if (confirm('Apakah Anda yakin ingin menghapus barang ini?')) {
+                    await supabaseClient.from('inventory').delete().eq('id', itemId);
+                    await updateAllViews();
+                }
+            }
+             if (e.target.classList.contains('return-item-btn')) {
+                const loanId = parseInt(e.target.dataset.loanid);
+                const { data: loan, error } = await supabaseClient.from('loans').select('*, inventory(name)').eq('id', loanId).single();
+                if(loan){
+                    returnModalLoanId.value = loanId;
+                    returnModalInfo.textContent = `${loan.inventory.name} (x${loan.quantity}) oleh ${loan.borrowerName}`;
+                    returnModal.classList.remove('hidden');
+                }
+            }
+            if (e.target.classList.contains('confirm-payment-admin-btn')) {
+                const loanId = parseInt(e.target.dataset.loanid);
+                const { error } = await supabaseClient.from('loans').update({ dendaStatus: 'Lunas' }).eq('id', loanId);
+                 if (!error) {
+                    alert('Pembayaran denda telah dikonfirmasi.');
+                    await updateAllViews();
+                 }
+            }
+        });
+
+        userPage.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('borrow-item-btn')) {
+                const itemId = parseInt(e.target.dataset.id);
+                const { data: item, error } = await supabaseClient.from('inventory').select('*').eq('id', itemId).single();
+                if (item) {
+                    modalItemId.value = item.id;
+                    modalItemName.textContent = item.name;
+                    loanQuantityInput.max = item.total - item.borrowed;
+                    loanModal.classList.remove('hidden');
+                }
+            }
+            if (e.target.classList.contains('request-return-btn')) {
+                const loanId = parseInt(e.target.dataset.loanid);
+                await supabaseClient.from('loans').update({ status: 'Menunggu Konfirmasi' }).eq('id', loanId);
+                await updateAllViews();
+            }
+            if (e.target.classList.contains('confirm-payment-btn')) {
+                const loanId = parseInt(e.target.dataset.loanid);
+                await supabaseClient.from('loans').update({ dendaStatus: 'Menunggu Konfirmasi Pembayaran' }).eq('id', loanId);
+                alert('Konfirmasi pembayaran telah dikirim ke admin.');
+                await updateAllViews();
+            }
+        });
+
+        loanForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const itemId = parseInt(modalItemId.value);
+            const quantity = parseInt(loanQuantityInput.value);
+            
+            const { data: item, error } = await supabaseClient.from('inventory').select('total, borrowed').eq('id', itemId).single();
+            if (error || !item) { alert('Error: tidak bisa menemukan barang'); return; }
+
+            const available = item.total - item.borrowed;
+            if (quantity > 0 && quantity <= available) {
+                await supabaseClient.from('loans').insert({
+                    itemId: itemId,
+                    borrowerName: borrowerNameInput.value,
+                    className: borrowerClassInput.value,
+                    quantity: quantity,
+                    loanDate: new Date().toISOString().split('T')[0],
+                    returnDate: returnDateInput.value,
+                    status: 'Dipinjam',
+                });
+                await supabaseClient.from('inventory').update({ borrowed: item.borrowed + quantity }).eq('id', itemId);
+                
+                await updateAllViews();
+                loanModal.classList.add('hidden');
+                loanForm.reset();
+            } else {
+                alert(`Maaf, jumlah barang tidak mencukupi atau tidak valid. Tersedia: ${available}`);
+            }
+        });
+        
+        returnForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const loanId = parseInt(returnModalLoanId.value);
+            const condition = returnConditionSelect.value;
+            
+            const { data: loan, error } = await supabaseClient.from('loans').select('*, inventory(borrowed)').eq('id', loanId).single();
+            if (error || !loan) { alert('Error: tidak bisa menemukan data pinjaman'); return; }
+            
+            let consequences = [];
+            let hasDenda = false;
+            if (new Date(loan.returnDate) < today) { consequences.push('Denda Terlambat: Rp10.000'); hasDenda = true; }
+            if (condition === 'Rusak Ringan') { consequences.push('Denda Kerusakan: Rp50.000'); hasDenda = true; }
+            else if (condition === 'Rusak Berat' || condition === 'Hilang') { consequences.push('Wajib Ganti Baru!'); hasDenda = true; }
+            
+            const finalConsequence = consequences.length > 0 ? consequences.join(', ') : 'Tidak ada';
+            const dendaStatus = hasDenda ? 'Belum Dibayar' : 'Lunas';
+            
+            await supabaseClient.from('loans').update({
+                status: 'Dikembalikan',
+                returnCondition: condition,
+                finalConsequence: finalConsequence,
+                dendaStatus: dendaStatus
+            }).eq('id', loanId);
+
+            if (condition !== 'Hilang') {
+                const currentBorrowed = loan.inventory.borrowed;
+                await supabaseClient.from('inventory').update({ borrowed: currentBorrowed - loan.quantity }).eq('id', loan.itemId);
+            }
+            
+            await updateAllViews();
+            returnModal.classList.add('hidden');
+        });
+
+        async function init() {
+            if (supabaseUrl.includes('https://imfhvxcuabmrhfueopme.supabase.co') || supabaseKey.includes('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltZmh2eGN1YWJtcmhmdWVvcG1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAyODM1ODYsImV4cCI6MjA3NTg1OTU4Nn0.rz9EjAg5896kUqlWIJFcp4vhjeq0D7j9-s2UyQ2sMQE')) {
+                alert('PENTING: Harap masukkan URL dan Kunci API Supabase Anda di dalam file HTML!');
+                return;
+            }
+            await populateUserSelect();
+            roleDropdown.dispatchEvent(new Event('change'));
+        }
+
+        init();
+        
         function logout() {
             currentUser = null;
             adminPage.classList.add('hidden');
@@ -729,228 +799,19 @@
         }
         adminLogoutBtn.addEventListener('click', logout);
         userLogoutBtn.addEventListener('click', logout);
-        
-        addUserForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const newUsername = document.getElementById('newUsername').value;
-            const newUserPassword = document.getElementById('newUserPassword').value;
-
-            if (users.some(user => user.username.toLowerCase() === newUsername.toLowerCase())) {
-                alert('Nama pengguna sudah ada!');
-                return;
-            }
-
-            users.push({ username: newUsername, password: newUserPassword });
-            alert(`Pengguna "${newUsername}" berhasil ditambahkan.`);
-            addUserForm.reset();
-            renderUserList();
-            populateUserSelect();
-        });
-
-
-        addItemForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const newItem = {
-                id: inventory.length > 0 ? Math.max(...inventory.map(i => i.id)) + 1 : 1,
-                code: e.target.itemCode.value,
-                name: e.target.itemName.value,
-                total: parseInt(e.target.itemTotal.value),
-                borrowed: 0
-            };
-            inventory.push(newItem);
-            updateAllViews();
-            addItemForm.reset();
-        });
-
-        adminPage.addEventListener('click', e => {
-            if (e.target.classList.contains('delete-item-btn')) {
-                const itemId = parseInt(e.target.dataset.id);
-                const itemInLoan = loans.some(loan => loan.itemId === itemId && loan.status === 'Dipinjam');
-                if (itemInLoan) {
-                    alert('Barang tidak dapat dihapus karena sedang ada yang meminjam.');
-                    return;
-                }
-                if (confirm('Apakah Anda yakin ingin menghapus barang ini?')) {
-                    inventory = inventory.filter(i => i.id !== itemId);
-                    updateAllViews();
-                }
-            }
-            if (e.target.classList.contains('return-item-btn')) {
-                const loanId = parseInt(e.target.dataset.loanid);
-                const loan = loans.find(l => l.loanId === loanId);
-                const item = inventory.find(i => i.id === loan.itemId);
-                if(loan && item){
-                    returnModalLoanId.value = loanId;
-                    returnModalInfo.textContent = `${item.name} (x${loan.quantity}) oleh ${loan.borrowerName}`;
-                    returnModal.classList.remove('hidden');
-                }
-            }
-            if(e.target.classList.contains('delete-user-btn')) {
-                const usernameToDelete = e.target.dataset.username;
-                const userHasActiveLoan = loans.some(loan => loan.borrowerName === usernameToDelete && loan.status === 'Dipinjam');
-
-                if (userHasActiveLoan) {
-                    alert(`Pengguna "${usernameToDelete}" tidak bisa dihapus karena masih memiliki pinjaman aktif.`);
-                    return;
-                }
-
-                if (confirm(`Apakah Anda yakin ingin menghapus pengguna "${usernameToDelete}"?`)) {
-                    users = users.filter(user => user.username !== usernameToDelete);
-                    renderUserList();
-                    populateUserSelect();
-                    alert(`Pengguna "${usernameToDelete}" berhasil dihapus.`);
-                }
-            }
-            if(e.target.classList.contains('confirm-payment-admin-btn')) {
-                const loanId = parseInt(e.target.dataset.loanid);
-                const loan = loans.find(l => l.loanId === loanId);
-                if(loan) {
-                    loan.dendaStatus = 'Lunas';
-                    alert('Pembayaran denda telah dikonfirmasi.');
-                    updateAllViews();
-                }
-            }
-        });
-
-        userPage.addEventListener('click', e => {
-             if (e.target.classList.contains('borrow-item-btn')) {
-                const itemId = parseInt(e.target.dataset.id);
-                const item = inventory.find(i => i.id === itemId);
-                if (item) {
-                    modalItemId.value = item.id;
-                    modalItemName.textContent = item.name;
-
-                    const available = item.total - item.borrowed;
-                    loanQuantityInput.max = available;
-                    loanQuantityInput.value = 1;
-                    
-                    const minReturnDate = new Date(today);
-                    minReturnDate.setDate(minReturnDate.getDate() + 1); // Besok
-                    const defaultReturnDate = new Date(today);
-                    defaultReturnDate.setDate(defaultReturnDate.getDate() + 7);
-                    
-                    returnDateInput.min = minReturnDate.toISOString().split('T')[0];
-                    returnDateInput.value = defaultReturnDate.toISOString().split('T')[0];
-
-                    loanModal.classList.remove('hidden');
-                }
-            }
-            if (e.target.classList.contains('request-return-btn')) {
-                const loanId = parseInt(e.target.dataset.loanid);
-                const loan = loans.find(l => l.loanId === loanId);
-                if (loan) {
-                    loan.status = 'Menunggu Konfirmasi';
-                    updateAllViews();
-                }
-            }
-            if (e.target.classList.contains('confirm-payment-btn')) {
-                const loanId = parseInt(e.target.dataset.loanid);
-                const loan = loans.find(l => l.loanId === loanId);
-                if (loan) {
-                    loan.dendaStatus = 'Menunggu Konfirmasi Pembayaran';
-                    alert('Konfirmasi pembayaran telah dikirim ke admin.');
-                    updateAllViews();
-                }
-            }
-        })
-        
-        closeModalBtn.addEventListener('click', () => {
-            loanModal.classList.add('hidden');
-            loanForm.reset();
-            borrowerNameInput.value = currentUser;
-        });
-        
-        closeReturnModalBtn.addEventListener('click', () => {
-            returnModal.classList.add('hidden');
-            returnForm.reset();
-        });
-
-
-        loanForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const itemId = parseInt(modalItemId.value);
-            const borrowerName = borrowerNameInput.value;
-            const className = borrowerClassInput.value;
-            const returnDate = returnDateInput.value;
-            const quantity = parseInt(loanQuantityInput.value);
-            
-            const item = inventory.find(i => i.id === itemId);
-            const available = item.total - item.borrowed;
-
-            if (quantity <= 0) {
-                alert('Jumlah pinjam harus lebih dari 0.');
-                return;
-            }
-
-            if(item && quantity <= available) {
-                item.borrowed += quantity;
-                const newLoan = {
-                    loanId: loans.length > 0 ? Math.max(...loans.map(l => l.loanId)) + 1 : 1,
-                    itemId: itemId,
-                    borrowerName: borrowerName,
-                    className: className,
-                    quantity: quantity,
-                    loanDate: today.toISOString().split('T')[0],
-                    returnDate: returnDate,
-                    status: 'Dipinjam',
-                    returnCondition: null,
-                    finalConsequence: null,
-                    dendaStatus: null
-                };
-                loans.push(newLoan);
-                updateAllViews();
-                loanModal.classList.add('hidden');
-                loanForm.reset();
-                borrowerNameInput.value = currentUser;
-
+        closeModalBtn.addEventListener('click', () => { loanModal.classList.add('hidden'); });
+        closeReturnModalBtn.addEventListener('click', () => { returnModal.classList.add('hidden'); });
+        roleDropdown.addEventListener('change', () => {
+            if (roleDropdown.value === 'user') {
+                usernameLabel.textContent = 'Pilih Nama Anda';
+                userSelect.classList.remove('hidden');
+                adminUsernameInput.classList.add('hidden');
             } else {
-                alert(`Maaf, jumlah barang tidak mencukupi. Tersedia: ${available}`);
-                loanModal.classList.add('hidden');
-                updateAllViews();
+                usernameLabel.textContent = 'Username';
+                userSelect.classList.add('hidden');
+                adminUsernameInput.classList.remove('hidden');
             }
         });
-
-        returnForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const loanId = parseInt(returnModalLoanId.value);
-            const condition = returnConditionSelect.value;
-            
-            const loan = loans.find(l => l.loanId === loanId);
-            if (loan) {
-                let consequences = [];
-                let hasDenda = false;
-                const returnDate = new Date(loan.returnDate);
-
-                if (returnDate < today) {
-                    consequences.push('Denda Terlambat: Rp10.000');
-                    hasDenda = true;
-                }
-
-                if (condition === 'Rusak Ringan') {
-                    consequences.push('Denda Kerusakan: Rp50.000');
-                    hasDenda = true;
-                } else if (condition === 'Rusak Berat' || condition === 'Hilang') {
-                    consequences.push('Wajib Ganti Baru!');
-                    hasDenda = true; // Anggap ini juga perlu konfirmasi
-                }
-
-                loan.finalConsequence = consequences.length > 0 ? consequences.join(', ') : 'Tidak ada';
-                loan.dendaStatus = hasDenda ? 'Belum Dibayar' : 'Lunas';
-                
-                const item = inventory.find(i => i.id === loan.itemId);
-                if (item && condition !== 'Hilang') {
-                    item.borrowed -= loan.quantity;
-                }
-                loan.status = 'Dikembalikan';
-                loan.returnCondition = condition;
-                updateAllViews();
-                returnModal.classList.add('hidden');
-            }
-        });
-
-        // Inisialisasi tampilan login
-        populateUserSelect();
-        roleDropdown.dispatchEvent(new Event('change'));
     });
     </script>
 </body>
