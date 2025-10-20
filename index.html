@@ -394,12 +394,13 @@
         }
 
         async function renderLoanHistory() {
-            const { data: loans, error: loanError } = await supabaseClient.from('loans').select('*, inventory(id, name)').order('status', { ascending: true });
-            if (loanError) { console.error('Error fetching data:', loanError); return; }
+            const { data: loans, error: loanError } = await supabaseClient.from('loans').select('*').order('status', { ascending: true });
+            const { data: inventory, error: invError } = await supabaseClient.from('inventory').select('id, name');
+            if (loanError || invError) { console.error('Error fetching data:', loanError || invError); return; }
 
             loanHistoryTable.innerHTML = '';
             loans.forEach(loan => {
-                const item = loan.inventory;
+                const item = inventory.find(i => i.id === loan.itemId);
                 const isOverdue = new Date(loan.returnDate) < today && loan.status === 'Dipinjam';
                 let statusBadge;
                 if(loan.status === 'Menunggu Konfirmasi') {
@@ -489,14 +490,15 @@
         }
 
         async function renderMyLoans() {
-            const { data: myAllLoans, error: loanError } = await supabaseClient.from('loans').select('*, inventory(id, name)').eq('borrowerName', currentUser).order('status', { ascending: true });
-            if (loanError) { console.error('Error fetching data:', loanError); return; }
+            const { data: myAllLoans, error: loanError } = await supabaseClient.from('loans').select('*').eq('borrowerName', currentUser).order('status', { ascending: true });
+            const { data: inventory, error: invError } = await supabaseClient.from('inventory').select('id, name');
+            if (loanError || invError) { console.error('Error fetching data:', loanError || invError); return; }
             
             myLoansTable.innerHTML = '';
             userNotifications.innerHTML = '';
             let notificationMessages = [];
             myAllLoans.forEach(loan => {
-                const item = loan.inventory;
+                const item = inventory.find(i => i.id === loan.itemId);
                 const isOverdue = new Date(loan.returnDate) < today && loan.status === 'Dipinjam';
                 let consequenceText = loan.finalConsequence || '-';
                 
@@ -672,11 +674,14 @@
             }
              if (e.target.classList.contains('return-item-btn')) {
                 const loanId = parseInt(e.target.dataset.loanid);
-                const { data: loan, error } = await supabaseClient.from('loans').select('*, inventory(name)').eq('id', loanId).single();
+                const { data: loan, error } = await supabaseClient.from('loans').select('*').eq('id', loanId).single();
                 if(loan){
-                    returnModalLoanId.value = loanId;
-                    returnModalInfo.textContent = `${loan.inventory.name} (x${loan.quantity}) oleh ${loan.borrowerName}`;
-                    returnModal.classList.remove('hidden');
+                    const { data: inventoryItem, error: invError } = await supabaseClient.from('inventory').select('name').eq('id', loan.itemId).single();
+                    if (inventoryItem) {
+                        returnModalLoanId.value = loanId;
+                        returnModalInfo.textContent = `${inventoryItem.name} (x${loan.quantity}) oleh ${loan.borrowerName}`;
+                        returnModal.classList.remove('hidden');
+                    }
                 }
             }
             if (e.target.classList.contains('confirm-payment-admin-btn')) {
@@ -747,7 +752,7 @@
             const loanId = parseInt(returnModalLoanId.value);
             const condition = returnConditionSelect.value;
             
-            const { data: loan, error } = await supabaseClient.from('loans').select('*, inventory(borrowed)').eq('id', loanId).single();
+            const { data: loan, error } = await supabaseClient.from('loans').select('*').eq('id', loanId).single();
             if (error || !loan) { alert('Error: tidak bisa menemukan data pinjaman'); return; }
             
             let consequences = [];
